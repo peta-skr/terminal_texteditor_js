@@ -1,3 +1,4 @@
+const { Document } = require("./document");
 const { Terminal } = require("./terminal");
 const readline = require("readline");
 
@@ -15,6 +16,7 @@ class Editor {
     this.should_quit = false;
     this.terminal = new Terminal();
     this.cursor_position = new Position(0, 0);
+    this.document = new Document();
   }
 
   run() {
