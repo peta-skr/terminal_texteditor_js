@@ -15,7 +15,7 @@ class Terminal {
     this._stdout = process.stdin.setRawMode(true);
   }
 
-  size() {
+  getSize() {
     return this.size;
   }
 
@@ -23,19 +23,24 @@ class Terminal {
     console.clear();
   }
 
-  cursor_position(x, y) {
-    readline.cursorTo(process.stdout, x, y);
+  cursor_position(position) {
+    readline.cursorTo(process.stdout, position.x, position.y);
   }
 
   flush() {}
 
-  // cursor_hide() {}
+  cursor_hide() {
+    process.stdout.write("\x1b[?25l");
+  }
 
-  // cursor_show() {}
+  cursor_show() {
+    // カーソルを表示する
+    process.stdout.write("\x1b[?25h");
+  }
 
-  // clear_current_line() {
-  //   readline.clearLine(process.stdout);
-  // }
+  clear_current_line() {
+    readline.clearLine(process.stdout);
+  }
 }
 
 exports.Terminal = Terminal;
