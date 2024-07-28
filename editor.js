@@ -142,11 +142,22 @@ class Editor {
     console.log(`${welcome_message}\r`);
   }
 
+  draw_row(row) {
+    let start = 0;
+    let end = this.terminal.getSize().width;
+    let row_render = row.render(start, end);
+    console.log(`${row_render}\r`);
+  }
+
   draw_rows() {
     let height = this.terminal.getSize().height;
     for (let i = 0; i < height - 1; i++) {
       this.terminal.clear_current_line();
-      if (i == Math.floor(height / 3)) {
+      let row = this.document.row(i);
+      if (row) {
+        this.draw_row(row);
+      }else if () {
+
         this.draw_welcome_message();
       } else {
         console.log("~\r");

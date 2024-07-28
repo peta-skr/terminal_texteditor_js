@@ -7,8 +7,16 @@ class Document {
 
   open() {
     let rows = [];
-    rows.push(Row.from("Hello, World!"));
+    rows.push(new Row("Hello, World!"));
     return rows;
+  }
+
+  row(index) {
+    return this.rows[index];
+  }
+
+  is_empty() {
+    return this.rows.is_empty();
   }
 }
 
