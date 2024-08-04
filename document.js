@@ -1,14 +1,21 @@
 const { Row } = require("./row");
+const fs = require("fs");
 
 class Document {
   constructor() {
     this.rows = [];
   }
 
-  open() {
-    let rows = [];
-    rows.push(new Row("Hello, World!"));
-    return rows;
+  open(filename) {
+    try {
+      let contents = fs.readFileSync(filename, "utf-8").split("\r\n");
+      for (let value of contents) {
+        this.rows.push(new Row(value));
+      }
+      return this
+    }catch(e) {
+      process.exit(1);
+    }
   }
 
   row(index) {
@@ -16,7 +23,11 @@ class Document {
   }
 
   is_empty() {
-    return this.rows.is_empty();
+    return this.rows.length == 0;
+  }
+
+  len() {
+    return this.rows.length;
   }
 }
 

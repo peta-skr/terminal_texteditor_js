@@ -1,3 +1,4 @@
+const { workerData } = require("worker_threads");
 const { Document } = require("./document");
 const { Terminal } = require("./terminal");
 const readline = require("readline");
@@ -13,10 +14,23 @@ class Position {
 
 class Editor {
   constructor() {
+
+    let args = process.argv;
+    let document;
+    if (args.length > 2) {
+      let file_name = args[2];
+      console.log(file_name);
+      
+      document = new Document().open(file_name);
+    }else {
+      document = new Document();
+    }
+
     this.should_quit = false;
     this.terminal = new Terminal();
     this.cursor_position = new Position(0, 0);
-    this.document = new Document();
+    this.offset = new Position(0, 0);
+    this.document = document;
   }
 
   run() {
@@ -61,7 +75,7 @@ class Editor {
       console.log("Goodbye.\r");
       process.exit(0);
     } else {
-      this.terminal.cursor_position(this.cursor_position);
+      this.terminal.cursor_position(new Position(this.cursor_position.x - this.offset.x, this.cursor_position.y - this.offset.y));
     }
     this.terminal.cursor_show();
   }
@@ -87,14 +101,34 @@ class Editor {
     } else {
       console.log(key);
     }
+    this.scroll();
+  }
+
+  scroll() {
+    let position = this.cursor_position;
+    let width = this.terminal.getSize().width;
+    let height = this.terminal.getSize().height;
+    let offset = this.offset;
+
+    if (position.y < offset.y) {
+      offset.y = position.y;
+    }else if (position.y >= offset.y + height) {
+      offset.y = position.y - height + 1;
+    }
+
+    if (position.x < offset.x) {
+      offset.x = position.x;
+    }else if (position.x >= offset.x + width) {
+      offset.x = position.x - width + 1;
+    }
   }
 
   move_cursor(key) {
     let x = this.cursor_position.x;
     let y = this.cursor_position.y;
-    let size = this.terminal.getSize();
-    let height = size.height - 1;
-    let width = size.width - 1;
+    let height = this.document.len();
+    let width = this.document.row(y) ? this.document.row(y).len() : 0;
+
 
     switch (key.name) {
       case "up":
@@ -143,8 +177,9 @@ class Editor {
   }
 
   draw_row(row) {
-    let start = 0;
-    let end = this.terminal.getSize().width;
+    let width = this.terminal.getSize().width;
+    let start = this.offset.x;
+    let end = this.offset.x + width;
     let row_render = row.render(start, end);
     console.log(`${row_render}\r`);
   }
@@ -153,11 +188,10 @@ class Editor {
     let height = this.terminal.getSize().height;
     for (let i = 0; i < height - 1; i++) {
       this.terminal.clear_current_line();
-      let row = this.document.row(i);
+      let row = this.document.row(i + this.offset.y);
       if (row) {
         this.draw_row(row);
-      }else if () {
-
+      }else if (this.document.is_empty() && i == Math.floor(height / 3)) {
         this.draw_welcome_message();
       } else {
         console.log("~\r");
