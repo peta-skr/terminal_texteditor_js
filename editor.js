@@ -124,6 +124,7 @@ class Editor {
   }
 
   move_cursor(key) {
+    let terminal_height = this.terminal.getSize().height;
     let x = this.cursor_position.x;
     let y = this.cursor_position.y;
     let height = this.document.len();
@@ -140,18 +141,30 @@ class Editor {
         }
         break;
       case "left":
-        x = x > 0 ? x - 1 : 0;
+       if (x > 0) {
+          x -= 1;
+       }else if (y > 0) {
+        y -= 1;
+        if (this.document.row(y)) {
+          x = this.document.row(y).len();
+        }else {
+          x = 0;
+        }
+       }
         break;
       case "right":
         if (x < width) {
           x += 1;
+        }else if (y < height) {
+          y += 1;
+          x = 0;
         }
         break;
       case "pageup":
-        y = 0;
+        y = y > terminal_height ? y - terminal_height : 0;
         break;
       case "pagedown":
-        y = height;
+        y = y + terminal_height < height ? y + terminal_height : height;
         break;
       case "home":
         x = 0;
@@ -159,6 +172,11 @@ class Editor {
       case "end":
         x = width;
         break;
+    }
+
+    width = this.document.row(y) ? this.document.row(y).len() : 0;
+    if (x > width) {
+      x = width;
     }
 
     this.cursor_position.x = x;

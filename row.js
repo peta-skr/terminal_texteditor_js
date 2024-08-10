@@ -14,7 +14,7 @@ class Row {
   }
 
   is_empty() {
-    
+    return this.string.length == 0;
   }
 }
 
