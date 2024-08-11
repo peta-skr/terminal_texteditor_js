@@ -2,6 +2,7 @@ const { workerData } = require("worker_threads");
 const { Document } = require("./document");
 const { Terminal } = require("./terminal");
 const readline = require("readline");
+const { default: chalk } = require("chalk");
 
 const VERSION = process.versions.node;
 
@@ -75,6 +76,9 @@ class Editor {
       console.log("Goodbye.\r");
       process.exit(0);
     } else {
+      // this.draw_rows();
+      this.draw_status_bar();
+      this.draw_message_bar();
       this.terminal.cursor_position(new Position(this.cursor_position.x - this.offset.x, this.cursor_position.y - this.offset.y));
     }
     this.terminal.cursor_show();
@@ -204,7 +208,7 @@ class Editor {
 
   draw_rows() {
     let height = this.terminal.getSize().height;
-    for (let i = 0; i < height - 1; i++) {
+    for (let i = 0; i < height; i++) {
       this.terminal.clear_current_line();
       let row = this.document.row(i + this.offset.y);
       if (row) {
@@ -215,6 +219,15 @@ class Editor {
         console.log("~\r");
       }
     }
+  }
+
+  draw_status_bar() {
+    let spaces = " ".repeat(this.terminal.getSize().width);
+    console.log(chalk.bgWhite(`${spaces}/r`));
+  }
+
+  draw_message_bar() {
+
   }
 }
 

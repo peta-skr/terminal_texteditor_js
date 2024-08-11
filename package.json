@@ -8,5 +8,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "graphemesplit": "^2.4.4"
+  }
 }
